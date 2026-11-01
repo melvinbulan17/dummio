@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { FieldChip } from "@/src/components/FieldChip";
 import { FieldRow } from "@/src/components/FieldRow";
+import { Toggle } from "@/src/components/Toggle";
 import { Wordmark } from "@/src/components/Wordmark";
 import type { FillReport } from "@/src/fill/fill";
 import { countByGroup, groupOf } from "@/src/groups";
 import type { ScannedField } from "@/src/messages";
-import { loadFillOptions } from "@/src/storage/settings";
+import { SUPPORT_URL } from "@/src/links";
+import { loadFillOptions, settingsItem } from "@/src/storage/settings";
 import { sendToTab } from "@/src/tab";
 
 const VISIBLE_ROWS = 5;
@@ -25,8 +27,12 @@ export function App() {
   const [host, setHost] = useState("");
   const [tab, setTab] = useState<Browser.tabs.Tab>();
   const [showAll, setShowAll] = useState(false);
+  const [overwrite, setOverwrite] = useState(false);
 
   useEffect(() => {
+    void settingsItem
+      .getValue()
+      .then((settings) => setOverwrite(settings.overwrite));
     void (async () => {
       const tab = await activeTab();
       if (tab?.id === undefined) return setState({ kind: "blocked" });
@@ -41,9 +47,15 @@ export function App() {
     })();
   }, []);
 
+  const changeOverwrite = async (next: boolean) => {
+    setOverwrite(next);
+    const settings = await settingsItem.getValue();
+    await settingsItem.setValue({ ...settings, overwrite: next });
+  };
+
   const fill = async () => {
     if (tab?.id === undefined || state.kind !== "ready") return;
-    const options = await loadFillOptions(tab.url);
+    const options = { ...(await loadFillOptions(tab.url)), overwrite };
     const report = await sendToTab(tab.id, { type: "fill-page", options });
     setState({ ...state, report });
   };
@@ -128,7 +140,15 @@ export function App() {
             </button>
           )}
 
-          <section className="sticky bottom-0 bg-surface-0 p-4">
+          <section className="sticky bottom-0 flex flex-col gap-3 bg-surface-0 p-4">
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span id="popup-overwrite">Overwrite filled fields</span>
+              <Toggle
+                checked={overwrite}
+                labelledBy="popup-overwrite"
+                onChange={(next) => void changeOverwrite(next)}
+              />
+            </div>
             <button
               type="button"
               onClick={fill}
@@ -142,6 +162,32 @@ export function App() {
           </section>
         </>
       )}
+
+      <a
+        href={SUPPORT_URL}
+        target="_blank"
+        rel="noreferrer"
+        className="group flex items-center gap-2 border-t border-line bg-dummy-yellow-soft px-4 py-2.5 text-xs text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-dummy-yellow"
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-4 shrink-0 text-dummy-yellow-text"
+        >
+          <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+          <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+          <path d="M6 2v2M10 2v2M14 2v2" />
+        </svg>
+        <span className="flex-1">Saving you time? Buy me a coffee.</span>
+        <span className="font-medium text-dummy-yellow-text group-hover:underline">
+          Ko-fi →
+        </span>
+      </a>
 
       <footer className="flex items-center justify-between border-t border-line bg-surface-50 px-4 py-2.5">
         <span className="text-xs text-ink-muted">

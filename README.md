@@ -29,3 +29,7 @@ pnpm dev
 | `pnpm typecheck`                    | TypeScript                        |
 | `pnpm test`                         | Unit tests in `tests/unit`        |
 | `pnpm test:e2e`                     | End-to-end tests in `tests/e2e`   |
+
+## Privacy
+
+Dummio collects nothing and makes no network requests. See [PRIVACY.md](PRIVACY.md).
