@@ -1,9 +1,161 @@
+import { useEffect, useState } from "react";
+import { FieldChip } from "@/src/components/FieldChip";
+import { FieldRow } from "@/src/components/FieldRow";
 import { Wordmark } from "@/src/components/Wordmark";
+import type { FillReport } from "@/src/fill/fill";
+import { countByGroup, groupOf } from "@/src/groups";
+import type { ScannedField } from "@/src/messages";
+import { DEFAULT_OPTIONS, sendToTab } from "@/src/tab";
+
+const VISIBLE_ROWS = 5;
+
+type State =
+  | { kind: "loading" }
+  | { kind: "blocked" }
+  | { kind: "ready"; fields: ScannedField[]; report?: FillReport };
+
+async function activeTab() {
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  return tab;
+}
 
 export function App() {
+  const [state, setState] = useState<State>({ kind: "loading" });
+  const [host, setHost] = useState("");
+  const [tabId, setTabId] = useState<number>();
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    void (async () => {
+      const tab = await activeTab();
+      if (tab?.id === undefined) return setState({ kind: "blocked" });
+      setTabId(tab.id);
+      setHost(tab.url ? new URL(tab.url).hostname : "");
+      try {
+        const fields = await sendToTab(tab.id, { type: "scan" });
+        setState({ kind: "ready", fields });
+      } catch {
+        setState({ kind: "blocked" });
+      }
+    })();
+  }, []);
+
+  const fill = async () => {
+    if (tabId === undefined || state.kind !== "ready") return;
+    const report = await sendToTab(tabId, {
+      type: "fill-page",
+      options: DEFAULT_OPTIONS,
+    });
+    setState({ ...state, report });
+  };
+
   return (
-    <main className="w-90 p-4">
-      <Wordmark />
-    </main>
+    <div className="flex w-90 flex-col">
+      <header className="flex items-center justify-between border-b border-line px-4 py-3.5">
+        <Wordmark />
+        <span className="truncate pl-4 font-mono text-xs text-ink-muted">
+          {host}
+        </span>
+      </header>
+
+      {state.kind === "loading" && (
+        <p className="px-4 py-6 text-ink-muted">Looking for fields…</p>
+      )}
+
+      {state.kind === "blocked" && (
+        <p className="px-4 py-6 text-ink-muted">
+          This page can’t be filled. Browsers keep extensions off built-in pages
+          like settings and the web store.
+        </p>
+      )}
+
+      {state.kind === "ready" && state.fields.length === 0 && (
+        <p className="px-4 py-6 text-ink-muted">
+          No fields found on this page.
+        </p>
+      )}
+
+      {state.kind === "ready" && state.fields.length > 0 && (
+        <>
+          <section className="flex flex-col gap-3 px-4 pt-4">
+            <p className="flex items-baseline gap-2">
+              <span className="text-[28px] leading-8 font-semibold tracking-tight tabular-nums">
+                {state.report
+                  ? state.report.fields.filter((f) => f.status === "filled")
+                      .length
+                  : state.fields.length}
+              </span>
+              <span className="text-ink-muted">
+                {state.report
+                  ? `of ${state.report.fields.length} fields filled`
+                  : "fields found"}
+              </span>
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {countByGroup(state.fields.map((field) => field.type)).map(
+                ({ group, count }) => (
+                  <FieldChip key={group} group={group} count={count} />
+                ),
+              )}
+            </div>
+          </section>
+
+          <ul className="flex flex-col gap-0.5 px-1 pt-3">
+            {(showAll ? state.fields : state.fields.slice(0, VISIBLE_ROWS)).map(
+              (field, index) => {
+                const result = state.report?.fields.find(
+                  (item) => item.ref === field.ref,
+                );
+                return (
+                  <FieldRow
+                    key={field.ref}
+                    index={index}
+                    label={field.label}
+                    group={groupOf(field.type)}
+                    value={result?.value}
+                    status={result?.status}
+                  />
+                );
+              },
+            )}
+          </ul>
+          {!showAll && state.fields.length > VISIBLE_ROWS && (
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="mx-4 mt-1 self-start rounded-md px-2 py-1 text-xs text-ink-muted hover:bg-surface-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dummy-yellow"
+            >
+              Show all {state.fields.length}
+            </button>
+          )}
+
+          <section className="p-4">
+            <button
+              type="button"
+              onClick={fill}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-dummy-yellow font-medium text-ink-on-accent transition-colors hover:bg-dummy-yellow-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dummy-yellow"
+            >
+              Fill page
+              <kbd className="rounded-sm border border-ink-on-accent/20 px-1.5 py-0.5 font-mono text-[11px]">
+                Alt+Shift+F
+              </kbd>
+            </button>
+          </section>
+        </>
+      )}
+
+      <footer className="flex items-center justify-between border-t border-line bg-surface-50 px-4 py-2.5">
+        <span className="text-xs text-ink-muted">
+          Nothing leaves your browser
+        </span>
+        <button
+          type="button"
+          onClick={() => void browser.runtime.openOptionsPage()}
+          className="rounded-md px-2 py-1 text-xs text-ink-muted hover:bg-surface-100 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dummy-yellow"
+        >
+          Settings
+        </button>
+      </footer>
+    </div>
   );
 }
