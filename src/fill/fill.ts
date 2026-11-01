@@ -16,6 +16,8 @@ export interface FillOptions {
   overwrite: boolean;
   seed?: number;
   now?: Date;
+  passwordLength?: number;
+  preset?: Partial<Record<FieldType, string>>;
 }
 
 export type FieldStatus = "filled" | "skipped" | "rejected";
@@ -136,7 +138,8 @@ function setup(options: FillOptions) {
   const now = options.now ?? new Date();
   const faker = createFaker(seed);
   const persona = createPersona(faker, options.locale, now);
-  return { seed, context: { faker, persona, now } };
+  const { passwordLength, preset } = options;
+  return { seed, context: { faker, persona, now, passwordLength, preset } };
 }
 
 export function fillPage(

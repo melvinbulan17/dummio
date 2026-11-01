@@ -5,7 +5,8 @@ import { Wordmark } from "@/src/components/Wordmark";
 import type { FillReport } from "@/src/fill/fill";
 import { countByGroup, groupOf } from "@/src/groups";
 import type { ScannedField } from "@/src/messages";
-import { DEFAULT_OPTIONS, sendToTab } from "@/src/tab";
+import { loadFillOptions } from "@/src/storage/settings";
+import { sendToTab } from "@/src/tab";
 
 const VISIBLE_ROWS = 5;
 
@@ -22,14 +23,14 @@ async function activeTab() {
 export function App() {
   const [state, setState] = useState<State>({ kind: "loading" });
   const [host, setHost] = useState("");
-  const [tabId, setTabId] = useState<number>();
+  const [tab, setTab] = useState<Browser.tabs.Tab>();
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     void (async () => {
       const tab = await activeTab();
       if (tab?.id === undefined) return setState({ kind: "blocked" });
-      setTabId(tab.id);
+      setTab(tab);
       setHost(tab.url ? new URL(tab.url).hostname : "");
       try {
         const fields = await sendToTab(tab.id, { type: "scan" });
@@ -41,11 +42,9 @@ export function App() {
   }, []);
 
   const fill = async () => {
-    if (tabId === undefined || state.kind !== "ready") return;
-    const report = await sendToTab(tabId, {
-      type: "fill-page",
-      options: DEFAULT_OPTIONS,
-    });
+    if (tab?.id === undefined || state.kind !== "ready") return;
+    const options = await loadFillOptions(tab.url);
+    const report = await sendToTab(tab.id, { type: "fill-page", options });
     setState({ ...state, report });
   };
 

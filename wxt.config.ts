@@ -6,7 +6,7 @@ export default defineConfig({
   manifest: {
     name: "Dummio",
     description: "Fill any web form with realistic fake data in one click.",
-    permissions: ["activeTab", "scripting", "contextMenus"],
+    permissions: ["activeTab", "scripting", "contextMenus", "storage"],
     commands: {
       "fill-page": {
         suggested_key: { default: "Alt+Shift+F" },
