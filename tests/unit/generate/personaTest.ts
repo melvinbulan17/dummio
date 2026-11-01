@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
-import {
-  PH_LAST_NAMES,
-  PH_MOBILE_PREFIXES,
-  PH_PLACES,
-} from "@/src/generate/data/ph";
-import { US_PLACES } from "@/src/generate/data/us";
+import { PH_LAST_NAMES, PH_MOBILE_PREFIXES } from "@/src/generate/data/ph";
+import { PLACES } from "@/src/generate/data/places";
+import { US_AREA_CODES } from "@/src/generate/data/us";
+import type { Place } from "@/src/generate/types";
 import {
   createFaker,
   createPersona,
@@ -13,6 +11,17 @@ import {
 } from "@/src/generate/persona";
 
 const now = new Date(2026, 10, 1);
+
+function isKnownPlace(locale: "ph" | "us", place: Place) {
+  return PLACES[locale].some(
+    (entry) =>
+      entry.city === place.city &&
+      entry.province === place.province &&
+      entry.zip === place.zip &&
+      (entry.districts.length === 0 ||
+        entry.districts.includes(place.district)),
+  );
+}
 
 describe("createPersona", () => {
   it("gives the same person for the same seed", () => {
@@ -31,7 +40,7 @@ describe("createPersona", () => {
     "builds a consistent Philippine person (seed %i)",
     (seed) => {
       const person = createPersona(createFaker(seed), "ph", now);
-      expect(PH_PLACES).toContainEqual(person.place);
+      expect(isKnownPlace("ph", person.place)).toBe(true);
       expect(PH_LAST_NAMES).toContain(person.middleName);
       expect(person.middleName).not.toBe(person.lastName);
       expect(person.email).toMatch(
@@ -57,7 +66,8 @@ describe("createPersona", () => {
 
   it("builds a US person with a fictional 555-01 number in the place's area code", () => {
     const person = createPersona(createFaker(7), "us", now);
-    expect(US_PLACES).toContainEqual(person.place);
+    expect(isKnownPlace("us", person.place)).toBe(true);
+    expect(person.place.areaCode).toBe(US_AREA_CODES[person.place.province]);
     expect(person.country).toBe("United States");
     expect(person.phone.countryCode).toBe("1");
     expect(person.phone.national).toMatch(
