@@ -128,9 +128,35 @@ describe("fillPage", () => {
     );
     expect(report.fields.map((field) => field.status)).toEqual([
       "filled",
-      "skipped",
+      "filled",
       "filled",
     ]);
+  });
+
+  it("turns optional checkboxes on or off on each fill, even when already checked", () => {
+    const states = new Set<boolean>();
+    for (let seed = 0; seed < 20; seed++) {
+      document.body.innerHTML = '<input type="checkbox" id="opt" checked />';
+      const [result] = fillPage({ ...options, seed }).fields;
+      const box = document.getElementById("opt") as HTMLInputElement;
+      states.add(box.checked);
+      expect(result?.value).toBe(box.checked ? "Checked" : "Unchecked");
+    }
+    expect(states).toEqual(new Set([true, false]));
+  });
+
+  it("reports which radio in a group is selected", () => {
+    document.body.innerHTML =
+      '<input type="radio" name="g" value="a" /><input type="radio" name="g" value="b" />';
+    const values = fillPage(options).fields.map((field) => field.value);
+    expect(values.sort()).toEqual(["Not selected", "Selected"]);
+  });
+
+  it("picks from an input's suggestion list", () => {
+    document.body.innerHTML =
+      '<label for="d">City</label><input id="d" list="cities" /><datalist id="cities"><option value="Iloilo"></option><option value="Dumaguete"></option></datalist>';
+    fillPage(options);
+    expect(["Iloilo", "Dumaguete"]).toContain(value("d"));
   });
 
   it("cuts values to the field's max length", () => {

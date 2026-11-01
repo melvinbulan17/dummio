@@ -128,7 +128,7 @@ export function App() {
             </button>
           )}
 
-          <section className="p-4">
+          <section className="sticky bottom-0 bg-surface-0 p-4">
             <button
               type="button"
               onClick={fill}

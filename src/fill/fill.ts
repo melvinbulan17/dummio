@@ -9,7 +9,7 @@ import { createFaker, createPersona } from "../generate/persona";
 import type { Locale } from "../generate/types";
 import { type GenerateContext, generateValue } from "../generate/values";
 import { chooseOption, isSelectEmpty } from "./choose";
-import { check, writeSelect, writeText } from "./write";
+import { setChecked, writeSelect, writeText } from "./write";
 
 export interface FillOptions {
   locale: Locale;
@@ -49,12 +49,6 @@ function radioGroup(element: HTMLInputElement): HTMLInputElement[] {
 
 function isEmpty(element: FormField): boolean {
   if (element instanceof HTMLSelectElement) return isSelectEmpty(element);
-  if (element instanceof HTMLInputElement && element.type === "radio") {
-    return radioGroup(element).every((radio) => !radio.checked);
-  }
-  if (element instanceof HTMLInputElement && element.type === "checkbox") {
-    return !element.checked;
-  }
   return element.value === "";
 }
 
@@ -72,8 +66,21 @@ function alternateFormats({ type, format }: DetectedField): FieldFormat[] {
   return [];
 }
 
+function suggestions(element: HTMLInputElement | HTMLTextAreaElement) {
+  if (!(element instanceof HTMLInputElement) || !element.list) return [];
+  return Array.from(element.list.options)
+    .map((option) => option.value)
+    .filter(Boolean);
+}
+
 function fillText(field: DetectedField, context: GenerateContext): Outcome {
   const element = field.element as HTMLInputElement | HTMLTextAreaElement;
+  const listed = suggestions(element);
+  if (listed.length > 0 && !context.preset?.[field.type]) {
+    const value = context.faker.helpers.arrayElement(listed);
+    writeText(element, value);
+    return { value, status: element.checkValidity() ? "filled" : "rejected" };
+  }
   for (const format of [field.format, ...alternateFormats(field)]) {
     const value = generateValue({ ...field, format }, context);
     if (value === undefined) return { status: "skipped" };
@@ -101,17 +108,18 @@ function fillChoice(
   const element = field.element as HTMLInputElement;
   if (element.type === "radio") {
     const group = element.name || `#${field.ref}`;
-    if (pickedGroups.has(group)) return { status: "skipped" };
-    pickedGroups.add(group);
-    const choice = context.faker.helpers.arrayElement(radioGroup(element));
-    check(choice);
-    return { value: choice.value, status: "filled" };
+    if (!pickedGroups.has(group)) {
+      pickedGroups.add(group);
+      setChecked(context.faker.helpers.arrayElement(radioGroup(element)), true);
+    }
+    return {
+      value: element.checked ? "Selected" : "Not selected",
+      status: "filled",
+    };
   }
-  if (!element.required && !context.faker.datatype.boolean()) {
-    return { status: "skipped" };
-  }
-  check(element);
-  return { value: "checked", status: "filled" };
+  const checked = element.required || context.faker.datatype.boolean();
+  setChecked(element, checked);
+  return { value: checked ? "Checked" : "Unchecked", status: "filled" };
 }
 
 function fillOne(
@@ -121,11 +129,11 @@ function fillOne(
   pickedGroups: Set<string>,
 ): FieldResult {
   const base = { ref: field.ref, type: field.type, label: fieldLabel(field) };
-  if (!overwrite && !isEmpty(field.element)) {
-    return { ...base, status: "skipped" };
-  }
   if (field.type === "checkbox" || field.type === "radio") {
     return { ...base, ...fillChoice(field, context, pickedGroups) };
+  }
+  if (!overwrite && !isEmpty(field.element)) {
+    return { ...base, status: "skipped" };
   }
   if (field.element instanceof HTMLSelectElement) {
     return { ...base, ...fillSelect(field, context) };
