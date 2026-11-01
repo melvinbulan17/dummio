@@ -25,6 +25,6 @@ export function writeSelect(
   dispatch(field);
 }
 
-export function check(field: HTMLInputElement) {
-  if (!field.checked) field.click();
+export function setChecked(field: HTMLInputElement, checked: boolean) {
+  if (field.checked !== checked) field.click();
 }
