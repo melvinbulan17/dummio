@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/melvinbulan17/form-filler/main/public/icon/128.png" width="72" height="72" alt="Dummio icon">
+  <img src="https://raw.githubusercontent.com/melvinbulan17/dummio/main/public/icon/128.png" width="72" height="72" alt="Dummio icon">
 </p>
 
 <h2 align="center">Dummio preview</h2>
@@ -82,4 +82,4 @@ That's exactly the feedback I'm looking for. Please tell me the page and the fie
 
 ### Tell me what you think
 
-Found a bug or have an idea? [Open an issue](https://github.com/melvinbulan17/form-filler/issues/new) or message me directly. Screenshots help a lot.
+Found a bug or have an idea? [Open an issue](https://github.com/melvinbulan17/dummio/issues/new) or message me directly. Screenshots help a lot.
