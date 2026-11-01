@@ -3,10 +3,10 @@ import {
   PH_FIRST_NAMES,
   PH_LAST_NAMES,
   PH_MOBILE_PREFIXES,
-  PH_PLACES,
   PH_STREETS,
 } from "./data/ph";
-import { US_PLACES } from "./data/us";
+import { PLACES, toPlace } from "./data/places";
+import usNames from "./data/us-names.json";
 import type { Locale, Persona } from "./types";
 
 export const EMAIL_DOMAINS = ["example.com", "example.net", "example.org"];
@@ -41,12 +41,18 @@ export function createPersona(
   const pick = faker.helpers.arrayElement;
   const isPh = locale === "ph";
 
-  const firstName = isPh ? pick(PH_FIRST_NAMES) : faker.person.firstName();
-  const lastName = isPh ? pick(PH_LAST_NAMES) : faker.person.lastName();
+  const firstNames = isPh ? PH_FIRST_NAMES : usNames.firstNames;
+  const lastNames = isPh ? PH_LAST_NAMES : usNames.lastNames;
+  const firstName = pick(firstNames);
+  const lastName = pick(lastNames);
   const middleName = isPh
-    ? pick(PH_LAST_NAMES.filter((name) => name !== lastName))
-    : faker.person.middleName();
-  const place = pick(isPh ? PH_PLACES : US_PLACES);
+    ? pick(lastNames.filter((name) => name !== lastName))
+    : pick(firstNames.filter((name) => name !== firstName));
+  const entry = pick(PLACES[locale]);
+  const place = toPlace(
+    entry,
+    pick(entry.districts.length ? entry.districts : [entry.city]),
+  );
 
   const year = now.getFullYear() - faker.number.int({ min: 18, max: 65 });
   const month = faker.number.int({ min: 1, max: 12 });
