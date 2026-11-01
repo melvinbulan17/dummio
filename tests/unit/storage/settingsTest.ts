@@ -5,6 +5,7 @@ import {
   loadFillOptions,
   presetsItem,
   settingsItem,
+  type Settings,
   siteOf,
 } from "@/src/storage/settings";
 
@@ -32,12 +33,12 @@ describe("loadFillOptions", () => {
     });
   });
 
-  it("uses saved settings and the preset for the page's site only", async () => {
+  it("uses saved settings, fills in newer defaults, and only this site's preset", async () => {
     await settingsItem.setValue({
       locale: "us",
       overwrite: true,
       passwordLength: 20,
-    });
+    } as Settings);
     await presetsItem.setValue({
       "acme.test": { email: "qa@example.com" },
       "other.test": { email: "else@example.com" },
@@ -46,6 +47,7 @@ describe("loadFillOptions", () => {
       locale: "us",
       overwrite: true,
       passwordLength: 20,
+      textStyle: "realistic",
       preset: { email: "qa@example.com" },
     });
   });
