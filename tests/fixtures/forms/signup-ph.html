@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sign up</title>
+  </head>
+  <body>
+    <form id="form">
+      <label for="fn">Unang pangalan</label>
+      <input id="fn" name="first_name" required />
+
+      <label for="ln">Apelyido</label>
+      <input id="ln" name="last_name" required />
+
+      <label for="em">Email address</label>
+      <input id="em" name="email" type="email" required />
+
+      <label for="mob">Mobile no.</label>
+      <span>+63</span
+      ><input id="mob" name="mobile" type="tel" maxlength="10" required />
+
+      <label for="bd">Birthday</label>
+      <input id="bd" name="birthday" placeholder="DD/MM/YYYY" required />
+
+      <label for="brgy">Barangay</label>
+      <input id="brgy" name="barangay" />
+
+      <label for="city">City / Municipality</label>
+      <input id="city" name="city" />
+
+      <label for="prov">Province</label>
+      <select id="prov" name="province">
+        <option value="">Select province</option>
+        <option>Metro Manila</option>
+        <option>Cebu</option>
+        <option>Davao del Sur</option>
+        <option>Iloilo</option>
+        <option>Negros Occidental</option>
+        <option>Misamis Oriental</option>
+        <option>Laguna</option>
+        <option>Pampanga</option>
+      </select>
+
+      <label for="zip">ZIP code</label>
+      <input id="zip" name="zip" maxlength="4" pattern="[0-9]{4}" />
+
+      <label for="pw">Password</label>
+      <input id="pw" name="password" type="password" minlength="8" required />
+
+      <span>Gender</span>
+      <input type="radio" name="gender" value="female" id="g1" /><label for="g1"
+        >Female</label
+      >
+      <input type="radio" name="gender" value="male" id="g2" /><label for="g2"
+        >Male</label
+      >
+
+      <input type="checkbox" id="terms" required /><label for="terms"
+        >I agree to the terms</label
+      >
+
+      <company-field></company-field>
+
+      <button type="submit">Sign up</button>
+    </form>
+    <script>
+      customElements.define(
+        "company-field",
+        class extends HTMLElement {
+          connectedCallback() {
+            this.attachShadow({ mode: "open" }).innerHTML =
+              '<label for="co">Company</label><input id="co" name="company" />';
+          }
+        },
+      );
+    </script>
+  </body>
+</html>
