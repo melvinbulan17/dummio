@@ -1,0 +1,38 @@
+name: Preview
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: preview
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm zip
+      - run: pnpm zip:firefox
+      - run: |
+          cp .output/*-chrome.zip dummio-chrome.zip
+          cp .output/*-firefox.zip dummio-firefox.zip
+          gh release delete preview --cleanup-tag --yes || true
+          gh release create preview dummio-chrome.zip dummio-firefox.zip \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Dummio preview" \
+            --notes-file .github/preview-notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
