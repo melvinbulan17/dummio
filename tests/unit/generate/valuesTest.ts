@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { FieldSignals, FieldType } from "@/src/detect/types";
+import { SENTENCES, SHORT_TEXT } from "@/src/generate/data/text";
 import { createFaker, createPersona } from "@/src/generate/persona";
 import { type FieldRequest, generateValue } from "@/src/generate/values";
 
@@ -135,5 +136,19 @@ describe("generateValue", () => {
   it("uses the password length from settings", () => {
     const ctx = { ...context(), passwordLength: 20 };
     expect(generateValue(request("password"), ctx)).toHaveLength(20);
+  });
+
+  it("writes realistic sentences by default", () => {
+    const text = generateValue(request("textarea"), context()) ?? "";
+    const used = SENTENCES.filter((sentence) => text.includes(sentence));
+    expect(used).toHaveLength(2);
+    expect(SHORT_TEXT).toContain(generateValue(request("unknown"), context()));
+  });
+
+  it("writes Lorem ipsum when asked", () => {
+    const ctx = { ...context(), textStyle: "lorem" as const };
+    const text = generateValue(request("textarea"), ctx) ?? "";
+    expect(SENTENCES.some((sentence) => text.includes(sentence))).toBe(false);
+    expect(SHORT_TEXT).not.toContain(generateValue(request("unknown"), ctx));
   });
 });

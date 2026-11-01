@@ -1,15 +1,19 @@
 import type { Faker } from "@faker-js/faker";
 import type { DetectedField, FieldType } from "../detect/types";
+import { SENTENCES, SHORT_TEXT } from "./data/text";
 import { fitValue, formatDate, formatPhone } from "./format";
 import type { Persona } from "./types";
 
 export type FieldRequest = Pick<DetectedField, "type" | "format" | "signals">;
+
+export type TextStyle = "realistic" | "lorem";
 
 export interface GenerateContext {
   faker: Faker;
   persona: Persona;
   now: Date;
   passwordLength?: number;
+  textStyle?: TextStyle;
   preset?: Partial<Record<FieldType, string>>;
 }
 
@@ -67,7 +71,13 @@ function upcomingDate(faker: Faker, now: Date): Persona["birthday"] {
 
 function rawValue(
   field: FieldRequest,
-  { faker, persona, now, passwordLength = 12 }: GenerateContext,
+  {
+    faker,
+    persona,
+    now,
+    passwordLength = 12,
+    textStyle = "realistic",
+  }: GenerateContext,
 ): string | undefined {
   switch (field.type) {
     case "firstName":
@@ -109,9 +119,13 @@ function rawValue(
     case "company":
       return persona.company;
     case "textarea":
-      return faker.lorem.sentences(2);
+      return textStyle === "lorem"
+        ? faker.lorem.sentences(2)
+        : faker.helpers.arrayElements(SENTENCES, 2).join(" ");
     case "unknown":
-      return faker.lorem.words(2);
+      return textStyle === "lorem"
+        ? faker.lorem.words(2)
+        : faker.helpers.arrayElement(SHORT_TEXT);
     case "select":
     case "checkbox":
     case "radio":

@@ -7,7 +7,11 @@ import type {
 } from "../detect/types";
 import { createFaker, createPersona } from "../generate/persona";
 import type { Locale } from "../generate/types";
-import { type GenerateContext, generateValue } from "../generate/values";
+import {
+  type GenerateContext,
+  generateValue,
+  type TextStyle,
+} from "../generate/values";
 import { chooseOption, isSelectEmpty } from "./choose";
 import { setChecked, writeSelect, writeText } from "./write";
 
@@ -17,6 +21,7 @@ export interface FillOptions {
   seed?: number;
   now?: Date;
   passwordLength?: number;
+  textStyle?: TextStyle;
   preset?: Partial<Record<FieldType, string>>;
 }
 
@@ -146,8 +151,11 @@ function setup(options: FillOptions) {
   const now = options.now ?? new Date();
   const faker = createFaker(seed);
   const persona = createPersona(faker, options.locale, now);
-  const { passwordLength, preset } = options;
-  return { seed, context: { faker, persona, now, passwordLength, preset } };
+  const { passwordLength, textStyle, preset } = options;
+  return {
+    seed,
+    context: { faker, persona, now, passwordLength, textStyle, preset },
+  };
 }
 
 export function fillPage(

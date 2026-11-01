@@ -2,11 +2,13 @@ import { storage } from "wxt/utils/storage";
 import type { FieldType } from "../detect/types";
 import type { FillOptions } from "../fill/fill";
 import type { Locale } from "../generate/types";
+import type { TextStyle } from "../generate/values";
 
 export interface Settings {
   locale: Locale;
   overwrite: boolean;
   passwordLength: number;
+  textStyle: TextStyle;
 }
 
 export type PresetValues = NonNullable<FillOptions["preset"]>;
@@ -16,6 +18,7 @@ export const DEFAULT_SETTINGS: Settings = {
   locale: "ph",
   overwrite: false,
   passwordLength: 12,
+  textStyle: "realistic",
 };
 
 export const PASSWORD_LENGTH = { min: 8, max: 64 };

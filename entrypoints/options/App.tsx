@@ -98,6 +98,27 @@ export function App() {
                 <option value="us">United States</option>
               </select>
             </label>
+            <label className="flex items-center justify-between gap-3 py-3">
+              <span>
+                <span className="block">Long text</span>
+                <span className="block text-xs text-ink-muted">
+                  Text areas and fields Dummio doesn’t recognise
+                </span>
+              </span>
+              <select
+                id="text-style"
+                className={control}
+                value={settings.textStyle}
+                onChange={(event) =>
+                  updateSettings({
+                    textStyle: event.target.value as Settings["textStyle"],
+                  })
+                }
+              >
+                <option value="realistic">Realistic sentences</option>
+                <option value="lorem">Lorem ipsum</option>
+              </select>
+            </label>
             <div className="flex items-center justify-between gap-3 py-3">
               <span id="overwrite-label">
                 <span className="block">Overwrite filled fields</span>
