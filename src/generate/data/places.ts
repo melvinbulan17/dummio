@@ -1,9 +1,9 @@
 import type { Locale, Place } from "../types";
 import phPlaces from "./ph-places.json";
-import { US_AREA_CODES } from "./us";
+import { US_AREA_CODES, US_STATE_NAMES } from "./us";
 import usPlaces from "./us-places.json";
 
-interface PlaceEntry {
+export interface PlaceEntry {
   city: string;
   province: string;
   zip: string;
@@ -41,4 +41,18 @@ export function toPlace(entry: PlaceEntry, district: string): Place {
     zip: entry.zip,
     areaCode: entry.areaCode,
   };
+}
+
+export function placeKey(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/\b(province of|city of|city)\b/g, "")
+    .replace(/[^a-z]/g, "");
+}
+
+export function provinceNames({ province }: { province: string }): string[] {
+  const name = US_STATE_NAMES[province];
+  return name ? [province, name] : [province];
 }

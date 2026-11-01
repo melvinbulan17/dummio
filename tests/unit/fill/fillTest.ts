@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { fillField, fillPage } from "@/src/fill/fill";
+import { PLACES } from "@/src/generate/data/places";
 
 const options = {
   locale: "ph" as const,
@@ -163,6 +164,42 @@ describe("fillPage", () => {
     document.body.innerHTML = `<label for="st">Street address</label><input id="st" maxlength="4" />`;
     fillPage(options);
     expect(value("st")).toHaveLength(4);
+  });
+});
+
+describe("address dropdowns", () => {
+  it.each(Array.from({ length: 15 }, (_, seed) => seed))(
+    "keeps the address consistent with a short province list (seed %i)",
+    (seed) => {
+      document.body.innerHTML = `
+        <label for="c">City</label><input id="c" />
+        <label for="p">Province</label>
+        <select id="p"><option value="">Select province</option><option>Cebu</option><option>Iloilo</option><option>Laguna</option></select>
+        <label for="z">ZIP code</label><input id="z" />
+      `;
+      fillPage({ ...options, seed });
+      const city = value("c");
+      const province = value("p");
+      const zip = value("z");
+      expect(["Cebu", "Iloilo", "Laguna"]).toContain(province);
+      expect(PLACES.ph).toContainEqual(
+        expect.objectContaining({ city, province, zip }),
+      );
+    },
+  );
+
+  it("matches a US state dropdown that uses full names", () => {
+    document.body.innerHTML = `
+      <label for="s">State</label>
+      <select id="s"><option value="">State</option><option value="TX">Texas</option><option value="OH">Ohio</option></select>
+      <label for="c">City</label><input id="c" />
+    `;
+    fillPage({ ...options, locale: "us", seed: 3 });
+    const state = value("s");
+    expect(["TX", "OH"]).toContain(state);
+    expect(PLACES.us).toContainEqual(
+      expect.objectContaining({ city: value("c"), province: state }),
+    );
   });
 });
 

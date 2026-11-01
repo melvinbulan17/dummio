@@ -1,4 +1,5 @@
 import type { Faker } from "@faker-js/faker";
+import { placeKey } from "../generate/data/places";
 
 const PLACEHOLDER = /^\s*(-+|select|choose|pick|please|pumili)\b/i;
 
@@ -17,7 +18,7 @@ const MONTHS = [
   ["december", "dec", "disyembre"],
 ];
 
-function usableOptions(select: HTMLSelectElement): HTMLOptionElement[] {
+export function usableOptions(select: HTMLSelectElement): HTMLOptionElement[] {
   return Array.from(select.options).filter(
     (option) =>
       !option.disabled && option.value !== "" && !PLACEHOLDER.test(option.text),
@@ -39,6 +40,8 @@ function matches(
     text.trim().toLowerCase(),
   );
   if (candidates.includes(target)) return true;
+  const key = placeKey(target);
+  if (key && candidates.some((text) => placeKey(text) === key)) return true;
   const number = Number(target);
   if (!Number.isInteger(number)) return false;
   if (candidates.some((text) => text !== "" && Number(text) === number))
@@ -50,13 +53,13 @@ function matches(
 export function chooseOption(
   select: HTMLSelectElement,
   faker: Faker,
-  wanted?: string,
+  wanted: string[] = [],
   isMonth = false,
 ): HTMLOptionElement | undefined {
   const options = usableOptions(select);
   if (options.length === 0) return undefined;
-  if (wanted) {
-    const match = options.find((option) => matches(option, wanted, isMonth));
+  for (const value of wanted) {
+    const match = options.find((option) => matches(option, value, isMonth));
     if (match) return match;
   }
   return faker.helpers.arrayElement(options);

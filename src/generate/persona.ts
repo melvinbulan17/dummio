@@ -5,7 +5,7 @@ import {
   PH_MOBILE_PREFIXES,
   PH_STREETS,
 } from "./data/ph";
-import { PLACES, toPlace } from "./data/places";
+import { PLACES, type PlaceEntry, toPlace } from "./data/places";
 import usNames from "./data/us-names.json";
 import type { Locale, Persona } from "./types";
 
@@ -37,6 +37,7 @@ export function createPersona(
   faker: Faker,
   locale: Locale,
   now: Date,
+  fits: (place: PlaceEntry) => boolean = () => true,
 ): Persona {
   const pick = faker.helpers.arrayElement;
   const isPh = locale === "ph";
@@ -48,7 +49,8 @@ export function createPersona(
   const middleName = isPh
     ? pick(lastNames.filter((name) => name !== lastName))
     : pick(firstNames.filter((name) => name !== firstName));
-  const entry = pick(PLACES[locale]);
+  const fitting = PLACES[locale].filter(fits);
+  const entry = pick(fitting.length > 0 ? fitting : PLACES[locale]);
   const place = toPlace(
     entry,
     pick(entry.districts.length ? entry.districts : [entry.city]),

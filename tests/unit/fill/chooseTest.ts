@@ -17,12 +17,13 @@ describe("chooseOption", () => {
           `<option value="PH">Philippines</option><option value="US">United States</option>`,
         ),
         faker,
-        "Philippines",
+        ["Philippines"],
       )?.value,
     ).toBe("PH");
     expect(
-      chooseOption(select(`<option>7</option><option>8</option>`), faker, "08")
-        ?.text,
+      chooseOption(select(`<option>7</option><option>8</option>`), faker, [
+        "08",
+      ])?.text,
     ).toBe("8");
   });
 
@@ -31,7 +32,7 @@ describe("chooseOption", () => {
       chooseOption(
         select(`<option>Feb</option><option>Mar</option>`),
         faker,
-        "03",
+        ["03"],
         true,
       )?.text,
     ).toBe("Mar");
@@ -39,7 +40,7 @@ describe("chooseOption", () => {
       chooseOption(
         select(`<option>Enero</option><option>Marso</option>`),
         faker,
-        "3",
+        ["3"],
         true,
       )?.text,
     ).toBe("Marso");
@@ -51,7 +52,7 @@ describe("chooseOption", () => {
         `<option value="">-- Choose --</option><option value="x">X</option>`,
       ),
       faker,
-      "Nowhere",
+      ["Nowhere"],
     );
     expect(option?.value).toBe("x");
   });
@@ -60,6 +61,33 @@ describe("chooseOption", () => {
     expect(
       chooseOption(select(`<option value="">Pumili</option>`), faker),
     ).toBeUndefined();
+  });
+
+  it("matches place names loosely", () => {
+    expect(
+      chooseOption(
+        select("<option>Cebu</option><option>Pasig</option>"),
+        faker,
+        ["Pasig City"],
+      )?.text,
+    ).toBe("Pasig");
+    expect(
+      chooseOption(
+        select("<option>Province of Cebu</option><option>Iloilo</option>"),
+        faker,
+        ["Cebu"],
+      )?.text,
+    ).toBe("Province of Cebu");
+  });
+
+  it("tries each wanted value in order", () => {
+    expect(
+      chooseOption(
+        select("<option>Texas</option><option>Ohio</option>"),
+        faker,
+        ["TX", "Texas"],
+      )?.text,
+    ).toBe("Texas");
   });
 });
 
