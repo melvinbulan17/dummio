@@ -31,7 +31,7 @@ function isHidden(element: Element): boolean {
   return false;
 }
 
-export function isFillable(field: FormField): boolean {
+function isFillable(field: FormField): boolean {
   if (field.disabled) return false;
   if (field instanceof HTMLInputElement && SKIPPED_INPUT_TYPES.has(field.type))
     return false;

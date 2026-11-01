@@ -3,7 +3,7 @@ import phPlaces from "./ph-places.json";
 import { US_AREA_CODES } from "./us";
 import usPlaces from "./us-places.json";
 
-export interface PlaceEntry {
+interface PlaceEntry {
   city: string;
   province: string;
   zip: string;

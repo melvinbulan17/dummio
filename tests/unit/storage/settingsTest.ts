@@ -7,6 +7,8 @@ import {
   settingsItem,
   type Settings,
   siteOf,
+  withoutPreset,
+  withPreset,
 } from "@/src/storage/settings";
 
 describe("siteOf", () => {
@@ -49,6 +51,32 @@ describe("loadFillOptions", () => {
       passwordLength: 20,
       textStyle: "realistic",
       preset: { email: "qa@example.com" },
+    });
+  });
+});
+
+describe("withPreset and withoutPreset", () => {
+  it("adds fields to a site and keeps other sites", () => {
+    const one = withPreset({}, "acme.test", "email", "qa@example.com");
+    const two = withPreset(one, "acme.test", "password", "Secret123!");
+    const three = withPreset(two, "shop.test", "phone", "09171234567");
+    expect(three).toEqual({
+      "acme.test": { email: "qa@example.com", password: "Secret123!" },
+      "shop.test": { phone: "09171234567" },
+    });
+  });
+
+  it("removes one field, and the site once it has none left", () => {
+    const presets = {
+      "acme.test": { email: "qa@example.com", password: "Secret123!" },
+      "shop.test": { phone: "09171234567" },
+    };
+    expect(withoutPreset(presets, "acme.test", "email")).toEqual({
+      "acme.test": { password: "Secret123!" },
+      "shop.test": { phone: "09171234567" },
+    });
+    expect(withoutPreset(presets, "shop.test", "phone")).toEqual({
+      "acme.test": { email: "qa@example.com", password: "Secret123!" },
     });
   });
 });

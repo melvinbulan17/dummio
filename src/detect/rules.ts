@@ -5,7 +5,7 @@ export type ScoredType = Exclude<
   "textarea" | "select" | "checkbox" | "radio" | "unknown"
 >;
 
-export interface KeywordRule {
+interface KeywordRule {
   type: ScoredType;
   phrases?: string[];
   tokens?: string[];
