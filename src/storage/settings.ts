@@ -11,7 +11,7 @@ export interface Settings {
   textStyle: TextStyle;
 }
 
-export type PresetValues = NonNullable<FillOptions["preset"]>;
+type PresetValues = NonNullable<FillOptions["preset"]>;
 export type Presets = Record<string, PresetValues>;
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -67,4 +67,26 @@ export async function loadFillOptions(url?: string): Promise<FillOptions> {
     ...settings,
     preset: presets[site] ?? {},
   };
+}
+
+export function withPreset(
+  presets: Presets,
+  site: string,
+  type: FieldType,
+  value: string,
+): Presets {
+  return { ...presets, [site]: { ...presets[site], [type]: value } };
+}
+
+export function withoutPreset(
+  presets: Presets,
+  site: string,
+  type: FieldType,
+): Presets {
+  const values = { ...presets[site] };
+  delete values[type];
+  const next = { ...presets };
+  if (Object.keys(values).length === 0) delete next[site];
+  else next[site] = values;
+  return next;
 }

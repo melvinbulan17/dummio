@@ -17,7 +17,7 @@ const MONTHS = [
   ["december", "dec", "disyembre"],
 ];
 
-export function usableOptions(select: HTMLSelectElement): HTMLOptionElement[] {
+function usableOptions(select: HTMLSelectElement): HTMLOptionElement[] {
   return Array.from(select.options).filter(
     (option) =>
       !option.disabled && option.value !== "" && !PLACEHOLDER.test(option.text),
