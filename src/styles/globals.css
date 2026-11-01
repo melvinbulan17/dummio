@@ -1,0 +1,69 @@
+@import "tailwindcss";
+@import "@fontsource-variable/onest";
+@import "@fontsource/fragment-mono";
+
+@theme {
+  --font-sans:
+    "Onest Variable", "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:
+    "Fragment Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --color-surface-0: #ffffff;
+  --color-surface-50: #f7f7f5;
+  --color-surface-100: #efeeea;
+  --color-line: #e5e4df;
+  --color-line-strong: #8c8b88;
+  --color-ink: #17171a;
+  --color-ink-muted: #626168;
+  --color-ink-on-accent: #17171a;
+  --color-dummy-yellow: #ffc21a;
+  --color-dummy-yellow-hover: #f2b100;
+  --color-dummy-yellow-text: #835600;
+  --color-dummy-yellow-soft: #fff4d1;
+  --color-skeleton: #ebeae6;
+  --color-skeleton-shine: #f7f6f3;
+  --color-type-person: #7a5af8;
+  --color-type-contact: #1a7fe0;
+  --color-type-address: #e86a10;
+  --color-type-date: #d63f78;
+  --color-type-number: #0f9b72;
+  --color-type-secret: #5f6b7a;
+  --color-success: #15803d;
+  --color-warning: #a15c00;
+  --color-danger: #c62828;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface-0: #1a1a1d;
+    --color-surface-50: #121214;
+    --color-surface-100: #232327;
+    --color-line: #2e2e33;
+    --color-line-strong: #6c6c74;
+    --color-ink: #ededef;
+    --color-ink-muted: #a3a3ab;
+    --color-dummy-yellow-hover: #ffd04d;
+    --color-dummy-yellow-text: #ffd04d;
+    --color-dummy-yellow-soft: #3a3017;
+    --color-skeleton: #2a2a2f;
+    --color-skeleton-shine: #38383e;
+    --color-type-person: #9b85ff;
+    --color-type-contact: #4ea2ff;
+    --color-type-address: #ff8a3d;
+    --color-type-date: #ff6b9e;
+    --color-type-number: #2fcf9c;
+    --color-type-secret: #94a0b0;
+    --color-success: #4ade80;
+    --color-warning: #fbbf24;
+    --color-danger: #f87171;
+    color-scheme: dark;
+  }
+}
+
+body {
+  @apply bg-surface-0 font-sans text-ink antialiased;
+}
