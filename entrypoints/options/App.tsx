@@ -1,6 +1,8 @@
 import { type FormEvent, useEffect, useState } from "react";
+import { Toggle } from "@/src/components/Toggle";
 import { Wordmark } from "@/src/components/Wordmark";
 import type { FieldType } from "@/src/detect/types";
+import { REPORT_URL, SUPPORT_URL } from "@/src/links";
 import {
   DEFAULT_SETTINGS,
   PASSWORD_LENGTH,
@@ -12,7 +14,6 @@ import {
   siteOf,
 } from "@/src/storage/settings";
 
-const REPORT_URL = "https://github.com/melvinbulan17/form-filler/issues/new";
 const FIELD_LABEL = Object.fromEntries(
   PRESET_FIELDS.map(({ type, label }) => [type, label]),
 ) as Record<FieldType, string>;
@@ -126,20 +127,11 @@ export function App() {
                   Replace values that are already there
                 </span>
               </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={settings.overwrite}
-                aria-labelledby="overwrite-label"
-                onClick={() =>
-                  updateSettings({ overwrite: !settings.overwrite })
-                }
-                className={`relative h-5 w-9 shrink-0 rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dummy-yellow ${settings.overwrite ? "border-dummy-yellow bg-dummy-yellow" : "border-line-strong bg-surface-100"}`}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 size-3.5 rounded-full transition-transform ${settings.overwrite ? "translate-x-4 bg-ink-on-accent" : "bg-ink-muted"}`}
-                />
-              </button>
+              <Toggle
+                checked={settings.overwrite}
+                labelledBy="overwrite-label"
+                onChange={(overwrite) => updateSettings({ overwrite })}
+              />
             </div>
             <label className="flex items-center justify-between gap-3 py-3">
               <span>
@@ -173,8 +165,9 @@ export function App() {
           <div>
             <h2 className="text-base font-semibold">Site presets</h2>
             <p className="text-sm text-ink-muted">
-              Always use the same value for a field on a site, like a fixed test
-              email.
+              Pick a site and a field, and Dummio always uses your value there,
+              like a fixed test email. Add as many sites and fields as you need,
+              one at a time.
             </p>
           </div>
 
@@ -221,7 +214,7 @@ export function App() {
               type="submit"
               className="h-9 rounded-md bg-dummy-yellow px-4 text-sm font-medium text-ink-on-accent hover:bg-dummy-yellow-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dummy-yellow"
             >
-              Save preset
+              Add preset
             </button>
             {error && (
               <p role="alert" className="w-full text-sm text-danger">
@@ -266,14 +259,22 @@ export function App() {
 
         <footer className="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-muted">
           <span>Settings are saved in this browser. Nothing leaves it.</span>
-          <a
-            href={REPORT_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="text-dummy-yellow-text hover:underline"
-          >
-            Report a problem
-          </a>
+          <span className="flex gap-4">
+            {[
+              { href: REPORT_URL, label: "Report a problem" },
+              { href: SUPPORT_URL, label: "Support Dummio on Ko-fi" },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-dummy-yellow-text hover:underline"
+              >
+                {link.label}
+              </a>
+            ))}
+          </span>
         </footer>
       </main>
     </div>
