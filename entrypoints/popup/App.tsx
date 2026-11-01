@@ -4,6 +4,7 @@ import { Wordmark } from "@/src/components/Wordmark";
 import type { FillReport } from "@/src/fill/fill";
 import type { ScannedField } from "@/src/messages";
 import { loadFillOptions, settingsItem } from "@/src/storage/settings";
+import { fillShortcut, openShortcutSettings } from "@/src/shortcut";
 import { sendToTab } from "@/src/tab";
 import { FieldList } from "./FieldList";
 import { FieldSummary } from "./FieldSummary";
@@ -31,8 +32,10 @@ export function App() {
   const [state, setState] = useState<State>({ kind: "loading" });
   const [tab, setTab] = useState<Browser.tabs.Tab>();
   const [overwrite, setOverwrite] = useState(false);
+  const [shortcut, setShortcut] = useState<string>();
 
   useEffect(() => {
+    void fillShortcut().then(setShortcut);
     void settingsItem
       .getValue()
       .then((settings) => setOverwrite(settings.overwrite));
@@ -88,6 +91,8 @@ export function App() {
             overwrite={overwrite}
             onOverwriteChange={(next) => void changeOverwrite(next)}
             onFill={() => void fill()}
+            shortcut={shortcut}
+            onSetShortcut={() => void openShortcutSettings()}
           />
         </>
       )}
