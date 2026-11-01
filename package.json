@@ -23,7 +23,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "postinstall": "wxt prepare",
-    "prepare": "husky"
+    "prepare": "husky",
+    "data": "node scripts/build-data.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
@@ -45,6 +46,7 @@
     "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "fflate": "^0.8.3",
     "globals": "^17.13.0",
     "husky": "^9.1.7",
     "jsdom": "^30.1.3",
