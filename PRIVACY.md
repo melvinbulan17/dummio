@@ -34,4 +34,4 @@ The settings page links to GitHub (to report a problem) and Ko-fi (to support th
 
 ## Contact
 
-Questions or concerns: open an issue at https://github.com/melvinbulan17/form-filler/issues
+Questions or concerns: open an issue at https://github.com/melvinbulan17/dummio/issues
