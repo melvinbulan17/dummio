@@ -125,4 +125,15 @@ describe("generateValue", () => {
       expect(generateValue(request(type), context())).toBeUndefined();
     }
   });
+
+  it("uses a site preset as it is, before generating", () => {
+    const ctx = { ...context(), preset: { email: "qa+login@example.com" } };
+    expect(generateValue(request("email"), ctx)).toBe("qa+login@example.com");
+    expect(generateValue(request("city"), ctx)).toBe(ctx.persona.place.city);
+  });
+
+  it("uses the password length from settings", () => {
+    const ctx = { ...context(), passwordLength: 20 };
+    expect(generateValue(request("password"), ctx)).toHaveLength(20);
+  });
 });

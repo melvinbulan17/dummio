@@ -1,4 +1,5 @@
-import { DEFAULT_OPTIONS, sendToTab } from "@/src/tab";
+import { loadFillOptions } from "@/src/storage/settings";
+import { sendToTab } from "@/src/tab";
 
 const FILL_FIELD_MENU = "fill-field";
 
@@ -13,15 +14,17 @@ export default defineBackground(() => {
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId !== FILL_FIELD_MENU || tab?.id === undefined) return;
-    void sendToTab(
-      tab.id,
-      { type: "fill-focused", options: DEFAULT_OPTIONS },
-      info.frameId ?? 0,
+    const tabId = tab.id;
+    void loadFillOptions(tab.url).then((options) =>
+      sendToTab(tabId, { type: "fill-focused", options }, info.frameId ?? 0),
     );
   });
 
   browser.commands.onCommand.addListener((command, tab) => {
     if (command !== "fill-page" || tab?.id === undefined) return;
-    void sendToTab(tab.id, { type: "fill-page", options: DEFAULT_OPTIONS });
+    const tabId = tab.id;
+    void loadFillOptions(tab.url).then((options) =>
+      sendToTab(tabId, { type: "fill-page", options }),
+    );
   });
 });

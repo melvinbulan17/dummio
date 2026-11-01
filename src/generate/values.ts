@@ -1,5 +1,5 @@
 import type { Faker } from "@faker-js/faker";
-import type { DetectedField } from "../detect/types";
+import type { DetectedField, FieldType } from "../detect/types";
 import { fitValue, formatDate, formatPhone } from "./format";
 import type { Persona } from "./types";
 
@@ -9,6 +9,8 @@ export interface GenerateContext {
   faker: Faker;
   persona: Persona;
   now: Date;
+  passwordLength?: number;
+  preset?: Partial<Record<FieldType, string>>;
 }
 
 const PASSWORD_SETS = [
@@ -18,10 +20,14 @@ const PASSWORD_SETS = [
   "!@#$%&*?",
 ];
 
-function password(faker: Faker, field: FieldRequest): string {
+function password(
+  faker: Faker,
+  field: FieldRequest,
+  preferred: number,
+): string {
   const { min, max } = field.format.length ?? {};
   const length = Math.min(
-    Math.max(12, min ?? 0),
+    Math.max(preferred, min ?? 0),
     max ?? Number.POSITIVE_INFINITY,
   );
   const required = PASSWORD_SETS.map((set) =>
@@ -61,7 +67,7 @@ function upcomingDate(faker: Faker, now: Date): Persona["birthday"] {
 
 function rawValue(
   field: FieldRequest,
-  { faker, persona, now }: GenerateContext,
+  { faker, persona, now, passwordLength = 12 }: GenerateContext,
 ): string | undefined {
   switch (field.type) {
     case "firstName":
@@ -95,7 +101,7 @@ function rawValue(
     case "date":
       return formatDate(upcomingDate(faker, now), field.format);
     case "password":
-      return password(faker, field);
+      return password(faker, field, passwordLength);
     case "url":
       return persona.website;
     case "number":
@@ -117,6 +123,8 @@ export function generateValue(
   field: FieldRequest,
   context: GenerateContext,
 ): string | undefined {
+  const preset = context.preset?.[field.type];
+  if (preset) return preset;
   const value = rawValue(field, context);
   return value === undefined ? undefined : fitValue(value, field.format);
 }
