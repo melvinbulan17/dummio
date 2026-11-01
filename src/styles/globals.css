@@ -67,3 +67,16 @@
 body {
   @apply bg-surface-0 font-sans text-ink antialiased;
 }
+
+@theme {
+  --animate-filled: filled 600ms ease-out both;
+
+  @keyframes filled {
+    from {
+      background-color: var(--color-dummy-yellow-soft);
+    }
+    to {
+      background-color: transparent;
+    }
+  }
+}

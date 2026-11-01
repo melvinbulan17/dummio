@@ -1,4 +1,4 @@
-import { detectField, detectFields } from "../detect/detect";
+import { detectField, detectFields, fieldLabel } from "../detect/detect";
 import type {
   DetectedField,
   FieldFormat,
@@ -35,17 +35,6 @@ export interface FillReport {
 }
 
 type Outcome = Pick<FieldResult, "value" | "status">;
-
-function labelOf({ signals }: DetectedField): string {
-  return (
-    signals.labelText ??
-    signals.ariaLabel ??
-    signals.placeholder ??
-    signals.name ??
-    signals.id ??
-    signals.tag
-  );
-}
 
 function radioGroup(element: HTMLInputElement): HTMLInputElement[] {
   if (!element.name) return [element];
@@ -129,7 +118,7 @@ function fillOne(
   context: GenerateContext,
   pickedGroups: Set<string>,
 ): FieldResult {
-  const base = { ref: field.ref, type: field.type, label: labelOf(field) };
+  const base = { ref: field.ref, type: field.type, label: fieldLabel(field) };
   if (!overwrite && !isEmpty(field.element)) {
     return { ...base, status: "skipped" };
   }

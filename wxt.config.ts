@@ -6,6 +6,13 @@ export default defineConfig({
   manifest: {
     name: "Dummio",
     description: "Fill any web form with realistic fake data in one click.",
+    permissions: ["activeTab", "scripting", "contextMenus"],
+    commands: {
+      "fill-page": {
+        suggested_key: { default: "Alt+Shift+F" },
+        description: "Fill every field on the page",
+      },
+    },
   },
   vite: () => ({
     plugins: [tailwindcss()],

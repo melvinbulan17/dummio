@@ -16,6 +16,19 @@ export function detectField(element: FormField, ref = 0): DetectedField {
   };
 }
 
+export function fieldLabel({
+  signals,
+}: Pick<DetectedField, "signals">): string {
+  return (
+    signals.labelText ??
+    signals.ariaLabel ??
+    signals.placeholder ??
+    signals.name ??
+    signals.id ??
+    signals.tag
+  );
+}
+
 export function detectFields(
   root: Document | ShadowRoot | Element = document,
 ): DetectedField[] {
