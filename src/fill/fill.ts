@@ -5,6 +5,11 @@ import type {
   FieldType,
   FormField,
 } from "../detect/types";
+import {
+  type PlaceEntry,
+  placeKey,
+  provinceNames,
+} from "../generate/data/places";
 import { createFaker, createPersona } from "../generate/persona";
 import type { Locale } from "../generate/types";
 import {
@@ -12,7 +17,7 @@ import {
   generateValue,
   type TextStyle,
 } from "../generate/values";
-import { chooseOption, isSelectEmpty } from "./choose";
+import { chooseOption, isSelectEmpty, usableOptions } from "./choose";
 import { setChecked, writeSelect, writeText } from "./write";
 
 export interface FillOptions {
@@ -97,7 +102,13 @@ function fillText(field: DetectedField, context: GenerateContext): Outcome {
 
 function fillSelect(field: DetectedField, context: GenerateContext): Outcome {
   const element = field.element as HTMLSelectElement;
-  const wanted = generateValue(field, context);
+  const value = generateValue(field, context);
+  const wanted =
+    field.type === "province" && !context.preset?.province
+      ? provinceNames(context.persona.place)
+      : value
+        ? [value]
+        : [];
   const isMonth = field.format.part === "month";
   const option = chooseOption(element, context.faker, wanted, isMonth);
   if (!option) return { status: "skipped" };
@@ -146,11 +157,39 @@ function fillOne(
   return { ...base, ...fillText(field, context) };
 }
 
-function setup(options: FillOptions) {
+function optionKeys(
+  fields: DetectedField[],
+  type: FieldType,
+): Set<string> | undefined {
+  const selects = fields.filter(
+    (field) =>
+      field.type === type && field.element instanceof HTMLSelectElement,
+  );
+  if (selects.length === 0) return undefined;
+  return new Set(
+    selects.flatMap((field) =>
+      usableOptions(field.element as HTMLSelectElement).flatMap((option) => [
+        placeKey(option.text),
+        placeKey(option.value),
+      ]),
+    ),
+  );
+}
+
+function placeFits(fields: DetectedField[]) {
+  const provinces = optionKeys(fields, "province");
+  const cities = optionKeys(fields, "city");
+  return (place: PlaceEntry) =>
+    (!provinces ||
+      provinceNames(place).some((name) => provinces.has(placeKey(name)))) &&
+    (!cities || cities.has(placeKey(place.city)));
+}
+
+function setup(options: FillOptions, fields: DetectedField[]) {
   const seed = options.seed ?? Math.floor(Math.random() * 2 ** 31);
   const now = options.now ?? new Date();
   const faker = createFaker(seed);
-  const persona = createPersona(faker, options.locale, now);
+  const persona = createPersona(faker, options.locale, now, placeFits(fields));
   const { passwordLength, textStyle, preset } = options;
   return {
     seed,
@@ -163,9 +202,10 @@ export function fillPage(
   root: Document | ShadowRoot | Element = document,
 ): FillReport {
   const start = performance.now();
-  const { seed, context } = setup(options);
+  const detected = detectFields(root);
+  const { seed, context } = setup(options, detected);
   const pickedGroups = new Set<string>();
-  const fields = detectFields(root).map((field) =>
+  const fields = detected.map((field) =>
     fillOne(field, options.overwrite, context, pickedGroups),
   );
   return { seed, ms: Math.round(performance.now() - start), fields };
@@ -175,6 +215,7 @@ export function fillField(
   element: FormField,
   options: FillOptions,
 ): FieldResult {
-  const { context } = setup(options);
-  return fillOne(detectField(element), true, context, new Set());
+  const field = detectField(element);
+  const { context } = setup(options, [field]);
+  return fillOne(field, true, context, new Set());
 }
