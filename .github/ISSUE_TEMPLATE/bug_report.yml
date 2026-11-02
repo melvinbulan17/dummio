@@ -1,0 +1,42 @@
+name: Bug report
+description: Something filled wrong or didn't work
+labels: [bug]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The page you were on. Use a public test page if the real one is private.
+      placeholder: https://example.com/signup
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Which field got the wrong value, or what didn't work. A screenshot helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Edge
+        - Brave
+        - Firefox
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: locale
+    attributes:
+      label: Data locale
+      options:
+        - Philippines
+        - United States
