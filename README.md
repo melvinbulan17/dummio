@@ -33,9 +33,9 @@
 
 ## Install
 
-Dummio isn't in the stores yet. To try the latest build:
+Dummio isn't in the Chrome Web Store or Firefox Add-ons yet, so for now you install it by hand:
 
-1. Download **dummio-chrome.zip** or **dummio-firefox.zip** from the [preview release](https://github.com/melvinbulan17/dummio/releases/tag/preview).
+1. Download **dummio-chrome.zip** or **dummio-firefox.zip** from the [latest release](https://github.com/melvinbulan17/dummio/releases/latest).
 2. Follow the setup steps on that page. It takes about two minutes.
 
 ## What it does
@@ -47,7 +47,7 @@ Dummio isn't in the stores yet. To try the latest build:
 - Keeps addresses consistent with the form's own province, state and city dropdowns.
 - Works with React, Vue and Angular forms.
 - Lets you pin values per site, like your usual test login on staging.
-- Uses `example.com` emails and fictional 555-01XX US numbers, so test sign-ups never reach a real person.
+- Uses reserved `example.com`, `example.net` and `example.org` emails and fictional 555-01XX US numbers, so test sign-ups with those never reach a real person. Philippine mobile numbers use real prefixes, so don't send live SMS to them.
 
 <p align="center">
   <img src="docs/images/settings.png" width="560" alt="Dummio settings with fill options and a site preset">
