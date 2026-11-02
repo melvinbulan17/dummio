@@ -1,0 +1,15 @@
+name: Feedback or idea
+description: Something you'd like Dummio to do, or do differently
+labels: [feedback]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea or feedback
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Where would it help?
+      description: The kind of form or testing task you had in mind.
