@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "../../entrypoints";
+@source "..";
 @import "@fontsource-variable/onest";
 @import "@fontsource/fragment-mono";
 

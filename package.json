@@ -1,7 +1,7 @@
 {
-  "name": "form-filler",
+  "name": "dummio",
   "description": "Fill any web form with realistic fake data in one click.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.16.1",
