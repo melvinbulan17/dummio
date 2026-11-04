@@ -33,10 +33,8 @@
 
 ## Install
 
-Dummio isn't in the Chrome Web Store or Firefox Add-ons yet, so for now you install it by hand:
-
-1. Download **dummio-chrome.zip** or **dummio-firefox.zip** from the [latest release](https://github.com/melvinbulan17/dummio/releases/latest).
-2. Follow the setup steps on that page. It takes about two minutes.
+- **Chrome:** [add it from the Chrome Web Store](https://chromewebstore.google.com/detail/dummio/ajpljdboafipblchifcpgnmjhdpilopb).
+- **Firefox:** [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/dummio/), once Mozilla finishes its review. Until then, the zip and setup steps are on the [latest release](https://github.com/melvinbulan17/dummio/releases/latest).
 
 ## What it does
 
