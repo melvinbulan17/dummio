@@ -34,7 +34,7 @@
 ## Install
 
 - **Chrome:** [add it from the Chrome Web Store](https://chromewebstore.google.com/detail/dummio/ajpljdboafipblchifcpgnmjhdpilopb).
-- **Firefox:** [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/dummio/), once Mozilla finishes its review. Until then, the zip and setup steps are on the [latest release](https://github.com/melvinbulan17/dummio/releases/latest).
+- **Firefox:** [add it from Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/dummio/).
 
 ## What it does
 
